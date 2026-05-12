@@ -7,8 +7,9 @@ Electron + React app for the **Razer Naga Trinity (VID `0x1532`, PID `0x0067`)**
 - Polling rate (125 / 500 / 1000 Hz)
 - Side-panel button remapping, persisted in EEPROM
 - Multi-step macros (text auto-type) triggered from side buttons
-- Lock/sleep RGB-off + restore on unlock/wake
+- Optional RGB-off when the screen locks / sleeps (toggleable in the tray menu); auto-restore on unlock/wake
 - Auto-launch at login, lives in the menu bar (tray-mode daemon)
+- **Bilingual UI: German / English**, auto-detected from the system locale, manually switchable in the sidebar footer. Tray menu follows the same language.
 
 The mouse keeps its DPI / polling / button mapping after unplug, sleep, reboot — only RGB and macros require the app running (limitation of the firmware, same as Synapse).
 
@@ -34,10 +35,11 @@ npm run dev
 
 On first launch:
 
-1. **Plug the Naga Trinity in.** The app opens with a menu-bar diamond icon and a main window.
-2. Click **"An Maus senden"** — RGB, DPI, polling rate, and (if configured) side-button bindings are written to the mouse.
+1. **Plug the Naga Trinity in.** The app opens with a menu-bar diamond icon and a main window. UI language is detected from the system locale (German or English). Switchable any time via the **DE / EN buttons in the sidebar footer**.
+2. Click **"Send to mouse" / "An Maus senden"** — RGB, DPI, polling rate, and (if configured) side-button bindings are written to the mouse.
 3. **First macro use** triggers a macOS permission prompt for *Accessibility*. Grant it: *System Settings → Privacy & Security → Accessibility* → enable **Electron**. If the prompt doesn't appear, add `node_modules/electron/dist/Electron.app` manually. After granting, restart Electron (`pkill -9 Electron && npm run dev`).
-4. Optionally enable **"Bei macOS-Login starten"** from the tray menu — the app then auto-launches on login, lives invisibly in the menu bar, and applies the active profile on every startup.
+4. Optionally enable **"Launch at macOS login"** from the tray menu — the app then auto-launches on login, lives invisibly in the menu bar, and applies the active profile on every startup.
+5. The tray menu also has **"Turn RGB off when screen locks"** — checked by default. Uncheck it if you want the lights to keep glowing during lock/sleep.
 
 ### Packaging a stand-alone app
 
@@ -67,18 +69,21 @@ See [`CLAUDE.md`](./CLAUDE.md) for the protocol details (Trinity-specific 2-step
 
 | Feature | Hardware-side | App-side |
 |---|---|---|
-| RGB (scroll + logo) | volatile while powered | ✅ applied on profile send + restored on unlock/wake |
+| RGB (scroll + logo) | volatile while powered | ✅ applied on profile send + auto-restored on unlock/wake |
 | DPI stages | persistent (EEPROM) | ✅ set + verified via round-trip read |
 | Polling rate | persistent (EEPROM) | ✅ set + verified |
 | Side-button bindings | persistent (EEPROM) | ✅ writable, Wireshark-decoded |
 | Macros (text auto-type) | uses F13-F24 trick | ✅ `globalShortcut` + `osascript` |
 | Auto-launch + tray | n/a | ✅ login-item + menu-bar daemon |
+| Bilingual UI (DE / EN) | n/a | ✅ auto-detect + manual switch, persists across restarts; tray menu localised too |
+| RGB-off-on-lock toggle | n/a | ✅ togglable in tray menu, persists in `profiles.json` |
 | Wheel-tilt remap | unknown source action type | ⚠️ UI-only, not pushed to hardware |
 | Profile-slot switcher | reads work, write path unverified | 🚧 planned |
+| Per-key colors / matrix RGB | unverified (OpenRazer marks as `HAS_MATRIX = False  // TODO`) | 🚧 not implemented |
 
 ## Stack
 
-Electron 42, React 19, Vite 8, TypeScript 6, `usb` (libusb N-API), Zustand. No external native build step — `usb` ships N-API prebuilts that work in both Node and Electron.
+Electron 42, React 19, Vite 8, TypeScript 6, `usb` (libusb N-API), Zustand, `i18next` + `react-i18next` (with `i18next-browser-languagedetector`). No external native build step — `usb` ships N-API prebuilts that work in both Node and Electron.
 
 ## Sources and credits
 
@@ -112,6 +117,7 @@ The `cls 0x02 cmd 0x0c` command structure was derived from a **Wireshark + USBPc
 - **[Electron](https://electronjs.org)** – `app.setLoginItemSettings`, `Tray`, `Menu`, `globalShortcut`, `powerMonitor`, `systemPreferences.isTrustedAccessibilityClient`.
 - **[Vite](https://vitejs.dev) / [`@vitejs/plugin-react`](https://github.com/vitejs/vite-plugin-react)** – dev server and bundler for the renderer.
 - **[Zustand](https://github.com/pmndrs/zustand)** – state store in the renderer.
+- **[`i18next`](https://www.i18next.com) + [`react-i18next`](https://react.i18next.com)** + **[`i18next-browser-languagedetector`](https://github.com/i18next/i18next-browser-languageDetector)** – DE/EN translation runtime in the renderer with persistence in `localStorage`. The Electron main process keeps its own small translation table for the tray menu (it's built before the renderer loads).
 - **[esbuild](https://esbuild.github.io)** – bundles the Electron main + preload (`build:electron` script).
 - **[Wireshark / `tshark`](https://www.wireshark.org)** + **[USBPcap](https://desowin.org/usbpcap/)** – Windows-side USB capture for the Synapse RE.
 
