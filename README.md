@@ -27,8 +27,8 @@ Not affiliated with Razer. Community reverse-engineering project.
 ### From source (current state)
 
 ```bash
-git clone git@github.com:cepheiden/Razor-Naga-Trinity-MACOS.git
-cd Razor-Naga-Trinity-MACOS
+git clone git@github.com:cepheiden/Razer-Naga-Trinity-MACOS.git
+cd Razer-Naga-Trinity-MACOS
 npm install
 npm run dev
 ```
