@@ -15,6 +15,11 @@ export function Sidebar() {
   const activeStage = active.dpi.stages[active.dpi.activeStage - 1] ?? active.dpi.stages[0]
   const currentLang = (i18n.resolvedLanguage ?? i18n.language ?? 'de').slice(0, 2) as SupportedLanguage
 
+  const switchLanguage = (code: SupportedLanguage) => {
+    void i18n.changeLanguage(code)
+    void window.naga?.updateSettings?.({ language: code })
+  }
+
   return (
     <aside className="sidebar">
       <div className="brand">
@@ -104,7 +109,7 @@ export function Sidebar() {
               key={code}
               type="button"
               className={`lang-button ${currentLang === code ? 'active' : ''}`}
-              onClick={() => void i18n.changeLanguage(code)}
+              onClick={() => switchLanguage(code)}
               aria-pressed={currentLang === code}
             >
               {code.toUpperCase()}

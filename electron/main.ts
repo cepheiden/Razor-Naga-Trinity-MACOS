@@ -32,10 +32,37 @@ let mainWindow: BrowserWindow | null = null
 let tray: Tray | null = null
 let isQuitting = false
 let cachedRgbOffOnLock = true
+let cachedLang: 'de' | 'en' = 'de'
+
+const TRAY_STRINGS = {
+  de: {
+    openWindow: 'Fenster öffnen',
+    reapplyProfile: 'Profil neu anwenden',
+    launchAtLogin: 'Bei macOS-Login starten',
+    rgbOffOnLock: 'RGB beim Sperren ausschalten',
+    quit: 'Beenden',
+  },
+  en: {
+    openWindow: 'Open window',
+    reapplyProfile: 'Re-apply profile',
+    launchAtLogin: 'Launch at macOS login',
+    rgbOffOnLock: 'Turn RGB off when screen locks',
+    quit: 'Quit',
+  },
+} as const
+
+const tx = () => TRAY_STRINGS[cachedLang]
+
+const detectInitialLang = (stored: 'de' | 'en' | undefined): 'de' | 'en' => {
+  if (stored === 'de' || stored === 'en') return stored
+  const sys = app.getLocale().toLowerCase()
+  return sys.startsWith('de') ? 'de' : 'en'
+}
 
 const refreshSettingsCache = async () => {
   const store = await readStore()
   cachedRgbOffOnLock = store.settings?.rgbOffOnLock !== false
+  cachedLang = detectInitialLang(store.settings?.language)
 }
 
 const createWindow = async () => {
@@ -96,23 +123,24 @@ const showWindow = async () => {
   }
 }
 
-const buildTrayMenu = () =>
-  Menu.buildFromTemplate([
+const buildTrayMenu = () => {
+  const s = tx()
+  return Menu.buildFromTemplate([
     {
-      label: 'Fenster öffnen',
+      label: s.openWindow,
       click: () => {
         void showWindow()
       },
     },
     {
-      label: 'Profil neu anwenden',
+      label: s.reapplyProfile,
       click: () => {
         void applyActiveProfile()
       },
     },
     { type: 'separator' },
     {
-      label: 'Bei macOS-Login starten',
+      label: s.launchAtLogin,
       type: 'checkbox',
       checked: app.getLoginItemSettings().openAtLogin,
       click: (item) => {
@@ -123,7 +151,7 @@ const buildTrayMenu = () =>
       },
     },
     {
-      label: 'RGB beim Sperren ausschalten',
+      label: s.rgbOffOnLock,
       type: 'checkbox',
       checked: cachedRgbOffOnLock,
       click: (item) => {
@@ -135,13 +163,14 @@ const buildTrayMenu = () =>
     },
     { type: 'separator' },
     {
-      label: 'Beenden',
+      label: s.quit,
       click: () => {
         isQuitting = true
         app.quit()
       },
     },
   ])
+}
 
 const ensureAccessibilityPermission = () => {
   // macOS: ohne diese Permission feuern weder globalShortcut-Callbacks noch osascript-Tippeingaben.
@@ -240,6 +269,7 @@ ipcMain.handle('app:get-settings', async () => {
 ipcMain.handle('app:update-settings', async (_event, partial: Partial<AppSettings>) => {
   const next = await updateSettings(partial)
   cachedRgbOffOnLock = next.settings?.rgbOffOnLock !== false
+  cachedLang = detectInitialLang(next.settings?.language)
   tray?.setContextMenu(buildTrayMenu())
   return next.settings ?? { rgbOffOnLock: true }
 })
