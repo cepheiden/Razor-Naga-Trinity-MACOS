@@ -116,6 +116,10 @@ export function Sidebar() {
             </button>
           ))}
         </div>
+        <p className="trademark-note">
+          <span>{t('trademark.short')}</span>
+          <span>{t('trademark.disclaimer')}</span>
+        </p>
       </footer>
     </aside>
   )

@@ -127,6 +127,12 @@ The `cls 0x02 cmd 0x0c` command structure was derived from a **Wireshark + USBPc
 - [System Events / `osascript` `keystroke`](https://developer.apple.com/library/archive/documentation/AppleScript/Conceptual/AppleScriptLangGuide/) – used for the macro replay.
 - TCC – [Apple's Privacy & Security overview](https://support.apple.com/guide/security/secace5e1da/web) – why `osascript` and `globalShortcut` need Accessibility permission.
 
+## Trademarks
+
+**Razer** and **Naga** are trademarks or registered trademarks of **Razer Inc.**, used here solely for the purpose of identifying the compatible hardware (Razer Naga Trinity Edition mouse) under nominative fair-use. This project is an independent community reverse-engineering effort and is **not affiliated with, endorsed by, sponsored by, or otherwise associated with Razer Inc.** Razer's official software is Razer Synapse 3, available from [razer.com](https://www.razer.com/synapse-3).
+
+All other product names, logos, and brands referenced in this repository are property of their respective owners. Use of these names does not imply endorsement.
+
 ## License
 
-MIT — see [LICENSE](./LICENSE).
+MIT — see [LICENSE](./LICENSE). The MIT licence covers the source code in this repository only; it grants no rights to Razer's trademarks or the Razer Naga Trinity firmware.

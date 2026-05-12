@@ -306,6 +306,27 @@
   border-color: rgba(0, 255, 102, 0.4);
 }
 
+.trademark-note {
+  margin: 6px 0 0;
+  padding: 0;
+  font-size: 9px;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  color: var(--text-2);
+  opacity: 0.65;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.trademark-note span:first-child {
+  font-weight: 500;
+}
+
+.trademark-note span:last-child {
+  opacity: 0.75;
+}
+
 /* ---------- Workspace ---------- */
 .workspace {
   position: relative;

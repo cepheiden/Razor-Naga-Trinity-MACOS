@@ -37,6 +37,10 @@
     "profileSaved": "Profil gespeichert.",
     "bridgeUnavailable": "Electron-Bridge nicht verfügbar (Browser-Modus)."
   },
+  "trademark": {
+    "short": "Razer® und Naga® sind Marken der Razer Inc.",
+    "disclaimer": "Inoffiziell · nicht assoziiert mit Razer"
+  },
   "lighting": {
     "livePreviewEyebrow": "Live-Vorschau",
     "livePreviewTitle": "Beleuchtungssimulation",
